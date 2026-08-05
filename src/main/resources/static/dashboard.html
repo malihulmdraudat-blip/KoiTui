@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Koi Tui - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="navbar">
+    <div class="brand"><img src="images/logo.png" alt="Koi Tui logo" style="height:32px; vertical-align:middle; margin-right:8px; border-radius:50%;"> Koi Tui</div>
+    <nav>
+      <a href="dashboard.html" class="active">Dashboard</a>
+      <a href="routine.html">Routine</a>
+      <a href="friends.html">Friends</a>
+      <a href="freeslot.html">Free Slot</a>
+      <a href="#" id="logoutLink">Logout</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <h1 class="page-title" id="welcomeMsg">Welcome!</h1>
+
+    <div class="cards-grid">
+      <div class="card">
+        <h3>Today's Classes</h3>
+        <div class="big-number" id="todayCount">-</div>
+        <p>class(es) scheduled today</p>
+      </div>
+      <div class="card">
+        <h3>Friends</h3>
+        <div class="big-number" id="friendCount">-</div>
+        <p>connected friend(s)</p>
+      </div>
+      <div class="card">
+        <h3>Free Slots Today</h3>
+        <div class="big-number" id="freeCount">-</div>
+        <p>free period(s) with your friends today</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Quick Links</h3>
+      <div class="quick-links">
+        <a href="routine.html" class="btn btn-quick-link">Manage your class routine</a>
+        <a href="friends.html" class="btn btn-quick-link">Add or remove friends</a>
+        <a href="freeslot.html" class="btn btn-quick-link">Find a common free slot</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Koi Tui - Routine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="navbar">
+    <div class="brand"><img src="images/logo.png" alt="Koi Tui logo" style="height:32px; vertical-align:middle; margin-right:8px; border-radius:50%;"> Koi Tui</div>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="routine.html" class="active">Routine</a>
+      <a href="friends.html">Friends</a>
+      <a href="freeslot.html">Free Slot</a>
+      <a href="#" id="logoutLink">Logout</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <h1 class="page-title">My Routine</h1>
+
+    <div class="panel">
+      <h3>Add a Class</h3>
+      <form id="routineForm" class="inline-form">
+        <div class="form-group">
+          <label>Day</label>
+          <select id="day" required>
+            <option value="SATURDAY">Saturday</option>
+            <option value="SUNDAY">Sunday</option>
+            <option value="MONDAY">Monday</option>
+            <option value="TUESDAY">Tuesday</option>
+            <option value="WEDNESDAY">Wednesday</option>
+            <option value="THURSDAY">Thursday</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Class Time</label>
+          <select id="period" required>
+            <option value="1">8:00 AM - 9:20 AM</option>
+            <option value="2">9:30 AM - 10:50 AM</option>
+            <option value="3">11:00 AM - 12:20 PM</option>
+            <option value="4">12:30 PM - 1:50 PM</option>
+            <option value="5">2:00 PM - 3:20 PM</option>
+            <option value="6">3:30 PM - 4:50 PM</option>
+            <option value="7">5:00 PM - 6:20 PM</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Course</label>
+          <input type="text" id="course" placeholder="e.g. CSE 220">
+        </div>
+        <div class="form-group">
+          <label>Room</label>
+          <input type="text" id="room" placeholder="e.g. Room 401">
+        </div>
+        <button type="submit" class="btn btn-small">Add</button>
+      </form>
+      <p class="error-msg" id="errorMsg"></p>
+    </div>
+
+    <div class="panel">
+      <h3>Weekly Timetable</h3>
+      <div id="timetableWrapper">Loading...</div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/routine.js"></script>
+</body>
+</html>

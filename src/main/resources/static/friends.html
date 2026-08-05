@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Koi Tui - Friends</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="navbar">
+    <div class="brand"><img src="images/logo.png" alt="Koi Tui logo" style="height:32px; vertical-align:middle; margin-right:8px; border-radius:50%;"> Koi Tui</div>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="routine.html">Routine</a>
+      <a href="friends.html" class="active">Friends</a>
+      <a href="freeslot.html">Free Slot</a>
+      <a href="#" id="logoutLink">Logout</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <h1 class="page-title">Friends</h1>
+
+    <div class="panel">
+      <h3>Add a Friend</h3>
+      <form id="addFriendForm" class="inline-form">
+        <div class="form-group">
+          <label>Friend's Student ID</label>
+          <input type="text" id="friendStudentId" required placeholder="e.g. 2021-1-60-002">
+        </div>
+        <button type="submit" class="btn btn-small">Add Friend</button>
+      </form>
+      <p class="error-msg" id="errorMsg"></p>
+    </div>
+
+    <div class="panel">
+      <h3>My Friends</h3>
+      <div id="friendsList">Loading...</div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/friends.js"></script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+:root {
+  --primary: #2854b8;
+  --primary-dark: #14295c;
+  --primary-light: #0d1526;
+  --white: #ffffff;
+  --surface: #111a2e;
+  --gray: #8b96ab;
+  --border: #22304f;
+  --danger: #ff5c5c;
+  --success: #2fd490;
+  --text: #e7ebf5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #05070c;
+  color: var(--text);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ---------- Auth pages (login/signup) ---------- */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth-card {
+  background: var(--surface);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 380px;
+}
+
+.auth-card h1 {
+  color: var(--primary);
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.auth-card p.subtitle {
+  text-align: center;
+  color: var(--gray);
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: var(--gray);
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  background: #0a0f1c;
+  color: var(--text);
+}
+
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.btn {
+  display: inline-block;
+  width: 100%;
+  padding: 11px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn:hover {
+  background: var(--primary-dark);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.btn-danger {
+  background: var(--danger);
+}
+
+.btn-small {
+  width: auto;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+/* ---------- Dashboard Quick Links buttons ---------- */
+.quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn-quick-link {
+  width: auto;
+  flex: 1 1 200px;
+  text-align: center;
+  padding: 12px 16px;
+  font-weight: 600;
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--gray);
+}
+
+.form-footer a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.error-msg {
+  color: var(--danger);
+  font-size: 13px;
+  margin-top: 10px;
+  min-height: 16px;
+}
+
+.success-msg {
+  color: var(--success);
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+/* ---------- App shell (navbar + layout) ---------- */
+.navbar {
+  background: var(--primary-dark);
+  color: var(--white);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar .brand {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.navbar nav {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+}
+
+.navbar nav a {
+  color: var(--white);
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.navbar nav a.active, .navbar nav a:hover {
+  opacity: 1;
+  border-bottom: 2px solid var(--white);
+  padding-bottom: 4px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.page-title {
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+/* ---------- Dashboard cards ---------- */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.card h3 {
+  margin: 0 0 8px 0;
+  color: var(--text);
+}
+
+.card .big-number {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ---------- Tables / timetable ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text);
+}
+
+th {
+  background: var(--primary-dark);
+  color: var(--white);
+}
+
+td.busy {
+  background: rgba(255, 92, 92, 0.15);
+}
+
+td.free {
+  background: rgba(47, 212, 144, 0.12);
+  font-weight: 600;
+  color: var(--success);
+}
+
+/* ---------- Forms inside cards ---------- */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.inline-form .form-group {
+  margin-bottom: 0;
+  min-width: 120px;
+  flex: 1;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.badge {
+  display: inline-block;
+  background: rgba(40, 84, 184, 0.2);
+  color: var(--primary);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}

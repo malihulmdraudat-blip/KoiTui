@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Koi Tui - Free Slot Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="navbar">
+    <div class="brand"><img src="images/logo.png" alt="Koi Tui logo" style="height:32px; vertical-align:middle; margin-right:8px; border-radius:50%;"> Koi Tui</div>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="routine.html">Routine</a>
+      <a href="friends.html">Friends</a>
+      <a href="freeslot.html" class="active">Free Slot</a>
+      <a href="#" id="logoutLink">Logout</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <h1 class="page-title">Find a Common Free Slot</h1>
+
+    <div class="panel">
+      <h3>Select Friends to Compare</h3>
+      <div id="friendCheckboxes">Loading friends...</div>
+      <button class="btn btn-small" id="findSlotsBtn" style="margin-top:14px; width:auto;">Find Free Slots</button>
+    </div>
+
+    <div class="panel">
+      <h3>Common Free Slots</h3>
+      <div id="resultsWrapper">Select friends above and click "Find Free Slots".</div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/freeslot.js"></script>
+</body>
+</html>
