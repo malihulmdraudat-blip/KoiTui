@@ -8,7 +8,7 @@ and Spring Boot serves both. No separate frontend server needed anymore.
 ## 1. What you need to install
 
 1. **Java 17 (JDK)** — https://adoptium.net — check with `java -version`
-2. **MySQL Community Server** (+ MySQL Workbench) — https://dev.mysql.com/downloads/mysql
+2. **PostgreSQL** (+ pgAdmin, optional GUI) — https://www.postgresql.org/download
 3. **VS Code** — https://code.visualstudio.com
 4. **VS Code Extensions**: "Extension Pack for Java", "Spring Boot Extension Pack"
 5. **Postman** — https://www.postman.com/downloads
@@ -28,7 +28,7 @@ FreeSlot/
 │   ├── controller/      -> REST endpoints (signup, login, routine, friends, free-slot)
 │   ├── dto/              -> request/response shapes for the API
 │   ├── entity/           -> @Entity classes = database tables (User, Routine, Friend)
-│   ├── repository/       -> Spring Data JPA interfaces (talk to MySQL)
+│   ├── repository/       -> Spring Data JPA interfaces (talk to PostgreSQL)
 │   ├── service/          -> business logic, incl. the free-slot algorithm
 │   ├── security/         -> JWT + Spring Security (JwtUtil, JwtAuthFilter,
 │   │                        CustomUserDetailsService, SecurityConfig)
@@ -47,7 +47,7 @@ FreeSlot/
 │   ├── templates/          -> only needed if you later add Thymeleaf; unused for now
 │   └── application.properties
 │
-├── database/schema.sql    -> run once in MySQL Workbench to create tables
+├── database/schema.sql    -> run once via psql (or pgAdmin) to create tables
 ├── pom.xml
 ├── mvnw / mvnw.cmd        -> Maven wrapper scripts
 └── .mvn/wrapper/          -> wrapper config (auto-downloads Maven on first run)
@@ -69,18 +69,33 @@ somewhere else.
 
 ## 3. Set up the database
 
-1. Open MySQL Workbench, connect with your root password.
-2. Run `database/schema.sql` — creates `freeslot_db` and the three tables.
+1. Create the database once: `createdb freeslot_db` (or do this in pgAdmin).
+2. Run the schema against it:
+   ```bash
+   psql -U postgres -d freeslot_db -f database/schema.sql
+   ```
+   This creates the three tables (`users`, `routine`, `friends`).
 
 ---
 
 ## 4. Configure the backend
 
-Edit `src/main/resources/application.properties`:
+`src/main/resources/application.properties` already reads its Postgres
+connection details from environment variables, falling back to local
+defaults if they're not set:
+
 ```properties
-spring.datasource.username=root
-spring.datasource.password=yourpassword
+spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5433/freeslot_db}
+spring.datasource.username=${DB_USERNAME:postgres}
+spring.datasource.password=${DB_PASSWORD:yourpassword}
 ```
+
+For local development, either edit the fallback values directly in the file
+to match your local Postgres setup, or set `DB_URL` / `DB_USERNAME` /
+`DB_PASSWORD` as environment variables — the same variables used in
+production (see the deployment section), so your local and hosted setups
+stay consistent. Note the default port above is `5433`, not Postgres's
+usual `5432` — adjust if your local instance runs on the standard port.
 
 ---
 
@@ -159,7 +174,7 @@ Add a `.gitignore` excluding `target/` and `.mvn/wrapper/maven-wrapper.jar`
 | Problem | Fix |
 |---|---|
 | `./mvnw: Permission denied` | Run `chmod +x mvnw` once (Mac/Linux) |
-| Backend won't start: "Communications link failure" | MySQL isn't running, or wrong credentials in `application.properties` |
+| Backend won't start: connection refused / authentication failed | PostgreSQL isn't running, or `DB_URL` / `DB_USERNAME` / `DB_PASSWORD` are wrong — check `application.properties` fallbacks or your environment variables |
 | Blank page at `localhost:8080/index.html` | Backend didn't fully start — check the terminal for errors |
 | 401/403 after login | Token expired (24h) or missing — check browser dev tools → Application → Local Storage for `freeslot_token` |
 | Free Slot page shows nothing | Both you and the selected friend(s) need routine entries added first |
