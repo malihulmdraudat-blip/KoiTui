@@ -22,5 +22,5 @@ public class Friend {
     @Column(name = "friend_id", nullable = false)
     private Long friendId;
 
-    private String status = "ACCEPTED";
+    private String status = "PENDING";
 }

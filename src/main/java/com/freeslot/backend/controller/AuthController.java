@@ -1,7 +1,9 @@
 package com.freeslot.backend.controller;
 
+import com.freeslot.backend.dto.ForgotPasswordRequest;
 import com.freeslot.backend.dto.JwtResponse;
 import com.freeslot.backend.dto.LoginRequest;
+import com.freeslot.backend.dto.MessageResponse;
 import com.freeslot.backend.dto.SignupRequest;
 import com.freeslot.backend.service.AuthService;
 import jakarta.validation.Valid;
@@ -22,5 +24,10 @@ public class AuthController {
     @PostMapping("/login")
     public JwtResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
+    }
+
+    @PostMapping("/forgot-password")
+    public MessageResponse forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        return authService.resetPassword(request);
     }
 }

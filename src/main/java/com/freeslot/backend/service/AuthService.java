@@ -1,7 +1,9 @@
 package com.freeslot.backend.service;
 
+import com.freeslot.backend.dto.ForgotPasswordRequest;
 import com.freeslot.backend.dto.JwtResponse;
 import com.freeslot.backend.dto.LoginRequest;
+import com.freeslot.backend.dto.MessageResponse;
 import com.freeslot.backend.dto.SignupRequest;
 import com.freeslot.backend.exception.BadRequestException;
 import com.freeslot.backend.entity.User;
@@ -59,5 +61,22 @@ public class AuthService {
 
         String token = jwtUtil.generateToken(user.getEmail());
         return new JwtResponse(token, user.getId(), user.getName(), user.getEmail());
+    }
+
+    // Simple identity-verification based reset: no email step required.
+    // The user proves ownership of the account by supplying both the email
+    // AND the student ID on file, then sets a brand new password directly.
+    public MessageResponse resetPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BadRequestException("No account matches that email and student ID"));
+
+        if (!user.getStudentId().equalsIgnoreCase(request.getStudentId())) {
+            throw new BadRequestException("No account matches that email and student ID");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return new MessageResponse("Password updated successfully. You can now log in with your new password.");
     }
 }

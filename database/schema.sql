@@ -29,6 +29,6 @@ CREATE TABLE IF NOT EXISTS friends (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     friend_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    status VARCHAR(20) DEFAULT 'ACCEPTED', -- kept simple for MVP: no pending requests yet
+    status VARCHAR(20) DEFAULT 'PENDING', -- 'PENDING' until the recipient accepts, then 'ACCEPTED'
     CONSTRAINT unique_friend_pair UNIQUE (user_id, friend_id)
 );

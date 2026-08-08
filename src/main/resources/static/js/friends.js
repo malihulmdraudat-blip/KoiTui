@@ -16,7 +16,7 @@ document.getElementById("addFriendForm").addEventListener("submit", async (e) =>
   try {
     await apiRequest("/friends/add", "POST", { friendStudentId });
     document.getElementById("addFriendForm").reset();
-    loadFriends();
+    loadRequests();
   } catch (err) {
     errorMsg.textContent = err.message;
   }
@@ -29,6 +29,56 @@ async function removeFriend(friendId) {
     loadFriends();
   } catch (err) {
     alert(err.message);
+  }
+}
+
+async function acceptRequest(requestId) {
+  try {
+    await apiRequest("/friends/requests/" + requestId + "/accept", "POST");
+    loadRequests();
+    loadFriends();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function rejectRequest(requestId) {
+  try {
+    await apiRequest("/friends/requests/" + requestId + "/reject", "POST");
+    loadRequests();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function loadRequests() {
+  const list = document.getElementById("requestsList");
+  try {
+    const requests = await apiRequest("/friends/requests", "GET");
+
+    if (requests.length === 0) {
+      list.innerHTML = "<p>No pending friend requests.</p>";
+      return;
+    }
+
+    let html = "";
+    requests.forEach(r => {
+      html += `
+        <div class="list-item">
+          <div>
+            <strong>${r.name}</strong>
+            <span class="badge">${r.studentId}</span>
+            ${r.semester ? `<span class="badge">${r.semester}</span>` : ""}
+          </div>
+          <div>
+            <button class="btn btn-small" onclick="acceptRequest(${r.requestId})">Accept</button>
+            <button class="btn btn-small btn-danger" onclick="rejectRequest(${r.requestId})">Reject</button>
+          </div>
+        </div>`;
+    });
+    list.innerHTML = html;
+  } catch (err) {
+    list.textContent = "Could not load friend requests: " + err.message;
   }
 }
 
@@ -60,4 +110,5 @@ async function loadFriends() {
   }
 }
 
+loadRequests();
 loadFriends();

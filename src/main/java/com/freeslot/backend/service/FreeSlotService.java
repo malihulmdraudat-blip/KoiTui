@@ -1,81 +1,139 @@
 package com.freeslot.backend.service;
 
-import com.freeslot.backend.dto.FreeSlotResponse;
-import com.freeslot.backend.entity.Routine;
+import com.freeslot.backend.dto.FriendRequest;
+import com.freeslot.backend.dto.FriendRequestResponse;
+import com.freeslot.backend.dto.FriendResponse;
+import com.freeslot.backend.exception.BadRequestException;
+import com.freeslot.backend.exception.ResourceNotFoundException;
+import com.freeslot.backend.entity.Friend;
 import com.freeslot.backend.entity.User;
-import com.freeslot.backend.repository.RoutineRepository;
+import com.freeslot.backend.repository.FriendRepository;
+import com.freeslot.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FreeSlotService {
+public class FriendService {
 
-    private final RoutineRepository routineRepository;
+    private static final String PENDING = "PENDING";
+    private static final String ACCEPTED = "ACCEPTED";
+
+    private final FriendRepository friendRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
 
-    // Bangladesh-style academic week. Change this if your university's week is different.
-    private static final List<String> DAYS = Arrays.asList(
-            "SATURDAY", "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY"
-    );
+    // Sends a friend request instead of adding instantly. The recipient must
+    // accept it (see acceptRequest) before the two become friends.
+    public FriendRequestResponse sendFriendRequest(String email, FriendRequest request) {
+        User user = userService.getUserByEmail(email);
 
-    /**
-     * Core algorithm (matches the guideline):
-     * 1. Represent each day's periods with 0 (free) and 1 (busy) for every user.
-     * 2. Compare all selected users period-by-period.
-     * 3. If every user has 0 (free) at that period, it's a common free slot.
-     */
-    public List<FreeSlotResponse> findCommonFreeSlots(String email, List<Long> friendIds) {
-        User currentUser = userService.getUserByEmail(email);
+        User target = userRepository.findByStudentId(request.getFriendStudentId())
+                .orElseThrow(() -> new ResourceNotFoundException("No student found with that student ID"));
 
-        List<Long> userIds = new ArrayList<>();
-        userIds.add(currentUser.getId());
-        if (friendIds != null) {
-            for (Long id : friendIds) {
-                if (!userIds.contains(id)) {
-                    userIds.add(id);
-                }
-            }
+        if (target.getId().equals(user.getId())) {
+            throw new BadRequestException("You cannot add yourself as a friend");
         }
 
-        List<Routine> allRoutines = routineRepository.findByUserIdIn(userIds);
-
-        // busyGrid[userIndex][dayIndex][period-1] = true if that user is busy at that slot
-        boolean[][][] busyGrid = new boolean[userIds.size()][DAYS.size()][PeriodSchedule.PERIODS_PER_DAY];
-
-        for (Routine r : allRoutines) {
-            int userIndex = userIds.indexOf(r.getUserId());
-            int dayIndex = DAYS.indexOf(r.getDay().toUpperCase());
-            int periodIndex = r.getPeriod() - 1;
-
-            if (userIndex == -1 || dayIndex == -1 || periodIndex < 0 || periodIndex >= PeriodSchedule.PERIODS_PER_DAY) {
-                continue; // skip malformed / out-of-range entries instead of crashing
+        friendRepository.findByUserIdAndFriendId(user.getId(), target.getId()).ifPresent(f -> {
+            if (ACCEPTED.equals(f.getStatus())) {
+                throw new BadRequestException("This user is already in your friend list");
             }
-            busyGrid[userIndex][dayIndex][periodIndex] = true;
+            throw new BadRequestException("You already sent a friend request to this user");
+        });
+
+        friendRepository.findByUserIdAndFriendId(target.getId(), user.getId()).ifPresent(f -> {
+            if (ACCEPTED.equals(f.getStatus())) {
+                throw new BadRequestException("This user is already in your friend list");
+            }
+            throw new BadRequestException("This user already sent you a friend request - check your friend requests");
+        });
+
+        Friend friendRequestEntry = new Friend();
+        friendRequestEntry.setUserId(user.getId());
+        friendRequestEntry.setFriendId(target.getId());
+        friendRequestEntry.setStatus(PENDING);
+        Friend saved = friendRepository.save(friendRequestEntry);
+
+        return new FriendRequestResponse(saved.getId(), user.getId(), target.getStudentId(),
+                target.getName(), target.getSemester());
+    }
+
+    // Friend requests sent TO the current user that are still awaiting a response.
+    public List<FriendRequestResponse> getIncomingRequests(String email) {
+        User user = userService.getUserByEmail(email);
+
+        return friendRepository.findByFriendIdAndStatus(user.getId(), PENDING).stream()
+                .map(f -> {
+                    User requester = userRepository.findById(f.getUserId())
+                            .orElseThrow(() -> new ResourceNotFoundException("Requester account missing"));
+                    return new FriendRequestResponse(f.getId(), requester.getId(), requester.getStudentId(),
+                            requester.getName(), requester.getSemester());
+                })
+                .toList();
+    }
+
+    @Transactional
+    public FriendResponse acceptRequest(String email, Long requestId) {
+        User user = userService.getUserByEmail(email);
+
+        Friend request = friendRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Friend request not found"));
+
+        if (!request.getFriendId().equals(user.getId()) || !PENDING.equals(request.getStatus())) {
+            throw new BadRequestException("This friend request is no longer valid");
         }
 
-        List<FreeSlotResponse> freeSlots = new ArrayList<>();
+        request.setStatus(ACCEPTED);
+        friendRepository.save(request);
 
-        for (int dayIndex = 0; dayIndex < DAYS.size(); dayIndex++) {
-            for (int period = 0; period < PeriodSchedule.PERIODS_PER_DAY; period++) {
-                boolean allFree = true;
-                for (int u = 0; u < userIds.size(); u++) {
-                    if (busyGrid[u][dayIndex][period]) {
-                        allFree = false;
-                        break;
-                    }
-                }
-                if (allFree) {
-                    int periodNumber = period + 1;
-                    freeSlots.add(new FreeSlotResponse(DAYS.get(dayIndex), periodNumber, PeriodSchedule.labelFor(periodNumber)));
-                }
-            }
+        // Mirror the relationship so it shows up in both users' friend lists.
+        User requester = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("Requester account missing"));
+
+        Friend reciprocal = friendRepository.findByUserIdAndFriendId(user.getId(), requester.getId())
+                .orElseGet(Friend::new);
+        reciprocal.setUserId(user.getId());
+        reciprocal.setFriendId(requester.getId());
+        reciprocal.setStatus(ACCEPTED);
+        friendRepository.save(reciprocal);
+
+        return new FriendResponse(requester.getId(), requester.getStudentId(), requester.getName(), requester.getSemester());
+    }
+
+    @Transactional
+    public void rejectRequest(String email, Long requestId) {
+        User user = userService.getUserByEmail(email);
+
+        Friend request = friendRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Friend request not found"));
+
+        if (!request.getFriendId().equals(user.getId()) || !PENDING.equals(request.getStatus())) {
+            throw new BadRequestException("This friend request is no longer valid");
         }
 
-        return freeSlots;
+        friendRepository.delete(request);
+    }
+
+    @Transactional
+    public void removeFriend(String email, Long friendId) {
+        User user = userService.getUserByEmail(email);
+        friendRepository.deleteByUserIdAndFriendId(user.getId(), friendId);
+        friendRepository.deleteByUserIdAndFriendId(friendId, user.getId());
+    }
+
+    public List<FriendResponse> getMyFriends(String email) {
+        User user = userService.getUserByEmail(email);
+
+        return friendRepository.findByUserIdAndStatus(user.getId(), ACCEPTED).stream()
+                .map(f -> {
+                    User friend = userRepository.findById(f.getFriendId())
+                            .orElseThrow(() -> new ResourceNotFoundException("Friend record missing"));
+                    return new FriendResponse(friend.getId(), friend.getStudentId(), friend.getName(), friend.getSemester());
+                })
+                .toList();
     }
 }
