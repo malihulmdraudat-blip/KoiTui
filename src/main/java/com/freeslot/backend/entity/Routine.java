@@ -20,10 +20,14 @@ public class Routine {
     private Long userId;
 
     @Column(nullable = false)
-    private String day; // SATURDAY, SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY
+    private String day;
 
     @Column(nullable = false)
-    private Integer period; // 1..8
+    private Integer period;
+
+    public Integer getPeriod() {
+        return period;
+    }
 
     private String course;
 
